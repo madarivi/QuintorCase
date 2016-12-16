@@ -6,7 +6,7 @@ package studycase.entities;
  * Song entity class for Hibernate
  *  
  */
-public class Song {
+public class Song extends Entity{
 
     private int songId;
     private String songName;
@@ -17,10 +17,10 @@ public class Song {
      * Required empty constructor for reflection
      */
     public Song() {}
+    
     /**
      * @param albumId
      * @param songName
-     * @throws IllegalArgumentException if songId <= 0
      */
     Song(String songName, Album album) {
         this.songName = songName;

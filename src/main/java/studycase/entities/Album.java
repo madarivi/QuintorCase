@@ -3,9 +3,6 @@
  */
 package studycase.entities;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author Marius
  * 
@@ -14,11 +11,10 @@ import java.util.Set;
  * generates instantiations of associated Song entities with the makeSong method
  *  
  */
-public class Album {
+public class Album extends Entity{
     
     private int albumId;
     private String albumName;
-    private Set<Song> songs = new HashSet<>();
     private Artist artist;
 
     // constructors
@@ -41,9 +37,8 @@ public class Album {
      * @param songName the name of the song
      * @return Song entity with name songName associated with this Album entity
      */
-    public Song makeSong(String songName) {
+    Song makeSong(String songName) {
         Song song = new Song(songName, this);
-        songs.add(song);
         return song;
     }
     
@@ -71,18 +66,6 @@ public class Album {
      */
     public void setAlbumName(String albumName) {    
         this.albumName = albumName;
-    }
-    /**
-     * @return the set of songs
-     */
-    public Set<Song> getSongs() {
-        return songs;
-    }
-    /**
-     * @param songs the songs to set
-     */
-    public void setSongs(Set<Song> songs) {
-        this.songs = songs;
     }
     /**
      * @return the artist

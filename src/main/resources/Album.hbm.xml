@@ -7,12 +7,6 @@
  			<generator class="increment"/>
  		</id>
  		<property name="albumName" column="album_name" type="string"/>
- 		<set name="songs" table="songs" inverse="true" fetch="select">
- 			<key>
- 				<column name="album_id" not-null="true"/>
- 			</key>
- 			<one-to-many class="studycase.entities.Song"/>
- 		</set>
  		<many-to-one name="artist" class="studycase.entities.Artist" fetch="select">
  			<column name="artist_id" not-null="true"/>
  		</many-to-one>

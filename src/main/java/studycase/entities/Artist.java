@@ -1,8 +1,5 @@
 package studycase.entities;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author Marius
  * 
@@ -11,11 +8,10 @@ import java.util.Set;
  * generates instantiations of associated Album entities with the makeAlbum method
  *  
  */
-public class Artist {
+public class Artist extends Entity{
 
     private int artistId;
     private String artistName;
-    private Set<Album> albums = new HashSet<>();
     
     // constructors
     /**
@@ -25,7 +21,7 @@ public class Artist {
     /**
      * @param artistName
      */
-    public Artist(String artistName) {
+    Artist(String artistName) {
         this.artistName = artistName;
     }
     
@@ -37,7 +33,6 @@ public class Artist {
      */
     public Album makeAlbum(String albumName){
         Album album = new Album(albumName, this);
-        albums.add(album);
         return album;
     }
     
@@ -65,17 +60,5 @@ public class Artist {
      */
     public void setArtistName(String artistName) {
         this.artistName = artistName;
-    }
-    /**
-     * @return the albums
-     */
-    public Set<Album> getAlbums() {
-        return albums;
-    }
-    /**
-     * @param albums the albums to set
-     */
-    public void setAlbums(Set<Album> albums) {
-        this.albums = albums;
     }
 }

@@ -7,11 +7,5 @@
  			<generator class="increment"/>
  		</id>
  		<property name="artistName" column="artist_name" type="string"/>
- 		<set name="albums" table="albums" inverse="true" fetch="select">
- 			<key>
- 				<column name="artist_id" not-null="true"/>
- 			</key>
- 			<one-to-many class="studycase.entities.Album"/>
- 		</set>
  	</class>
  </hibernate-mapping>
