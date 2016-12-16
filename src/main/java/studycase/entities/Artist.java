@@ -1,4 +1,4 @@
-package com.quintor.study_case.entities;
+package studycase.entities;
 
 import java.util.HashSet;
 import java.util.Set;

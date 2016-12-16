@@ -11,7 +11,7 @@
 		<property name="connection.password">musicAdmin</property>
 		
 		<!--  connection settings -->
-		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
 		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 		<property name="connection.pool_size">1</property>
 		<property name="show_sql">true</property>
@@ -19,11 +19,11 @@
 		
 		<!--  mapping files -->
 		<mapping resource="Artist.hbm.xml"/>
-		<mapping class="com.quintor.study_case.entities.Artist"/>
+		<mapping class="studycase.entities.Artist"/>
 		<mapping resource="Album.hbm.xml"/>
-		<mapping class="com.quintor.study_case.entities.Album"/>
+		<mapping class="studycase.entities.Album"/>
 		<mapping resource="Song.hbm.xml"/>
-		<mapping class="com.quintor.study_case.entities.Song"/>
+		<mapping class="studycase.entities.Song"/>
 		
 	</session-factory>
 </hibernate-configuration>

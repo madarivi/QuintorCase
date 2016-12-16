@@ -1,4 +1,4 @@
-package com.quintor.study_case.entities;
+package studycase.entities;
 
 /**
  * @author Marius

@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
  <hibernate-mapping>
- 	<class name="com.quintor.study_case.entities.Artist" table="artists" lazy="false" >
+ 	<class name="studycase.entities.Artist" table="artists" lazy="false" >
  		<id name="artistId" column="artist_id" type="int">
  			<generator class="increment"/>
  		</id>
@@ -11,7 +11,7 @@
  			<key>
  				<column name="artist_id" not-null="true"/>
  			</key>
- 			<one-to-many class="com.quintor.study_case.entities.Album"/>
+ 			<one-to-many class="studycase.entities.Album"/>
  		</set>
  	</class>
  </hibernate-mapping>

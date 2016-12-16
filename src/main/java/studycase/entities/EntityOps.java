@@ -1,10 +1,12 @@
-package com.quintor.study_case.entities;
+package studycase.entities;
+
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.service.ServiceRegistry;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
 
 public class EntityOps {
     private static final SessionFactory sessionFactory;
@@ -34,6 +36,16 @@ public class EntityOps {
             System.out.println("transaction commited");
             session.close();
             System.out.println("Session closed");
+            
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            List<Song> songs = session.createQuery("from Song").list();
+            session.getTransaction().commit();
+            session.close();
+            
+            for (Song songOut : songs) {
+                System.out.println(songOut);
+            }
         } finally {
             sessionFactory.close();
             StandardServiceRegistryBuilder.destroy(serviceRegistry);
