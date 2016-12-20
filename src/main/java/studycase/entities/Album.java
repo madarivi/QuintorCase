@@ -25,6 +25,7 @@ public class Album extends Entity{
     /**
      * @param artistId
      * @param albumName
+     * @throws IllegalArgumentException if artistId <= 0
      */
     Album(String albumName, Artist artist) {
         this.albumName = albumName;
