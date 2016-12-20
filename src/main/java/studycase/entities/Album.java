@@ -26,7 +26,7 @@ public class Album extends Entity{
      * @param artistId
      * @param albumName
      */
-    public Album(String albumName, Artist artist) {
+    Album(String albumName, Artist artist) {
         this.albumName = albumName;
         this.artist = artist;
     }

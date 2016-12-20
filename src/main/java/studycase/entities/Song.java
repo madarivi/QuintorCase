@@ -22,7 +22,7 @@ public class Song extends Entity{
      * @param albumId
      * @param songName
      */
-    public Song(String songName, Album album) {
+    Song(String songName, Album album) {
         this.songName = songName;
         this.album = album;
     }
