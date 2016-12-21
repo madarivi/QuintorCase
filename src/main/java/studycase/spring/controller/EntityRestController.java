@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import studycase.database.EntityController;
+import studycase.database.EntityEnum;
 import studycase.database.entities.Artist;
+import studycase.database.entities.Entity;
 
 @RestController
 public class EntityRestController {
@@ -27,23 +29,38 @@ public class EntityRestController {
     }
     
     /**
-     * Get an Artist from the database
+     * Get an artist from the database
      * 
      * @param id    the id of the artist
-     * @return      ResponseEntity with status NOT_FOUND -> 
-     *                  the artist was not found or an error occurred
-     *              ResponseEntity with status OK and the artist object ->
+     * @return      ResponseEntity with status INTERNAL_SERVER_ERROR ->
+     *                  something went wrong with the database access
+     *              ResponseEntity with status BAD_REQUEST ->
+     *                  table was not recognized
+     *              ResponseEntity with status NO_CONTENT -> 
+     *                  the artist was not found
+     *              ResponseEntity with status OK and the Artist object ->
      *                  the artist was successfully retrieved
      */
-    @GetMapping("/artists/{id}")
-    public ResponseEntity<Artist> getArtist(@PathVariable("id") int id) {
-
-        Artist artist = (Artist) entityController.getEntityById(Artist.class, id);
-        if (artist == null) {
-            return new ResponseEntity<Artist>(HttpStatus.NOT_FOUND);
+    @GetMapping("/{table}/{id}")
+    public ResponseEntity<Entity> getArtist(    @PathVariable("table") String table,
+                                                @PathVariable("id") int id) {
+        
+        EntityEnum entityEnum = EntityEnum.fromString(table);
+        if (entityEnum == null) return new ResponseEntity<Entity>(HttpStatus.BAD_REQUEST);
+        
+        Entity entity;
+        try {
+            entity = (Entity) entityController.getEntityById(entityEnum.getEntityClass(), id);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<Entity>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (entity == null) {
+            return new ResponseEntity<Entity>(HttpStatus.NO_CONTENT);
         }
 
-        return new ResponseEntity<Artist>(artist, HttpStatus.OK);
+        return new ResponseEntity<Entity>(entity, HttpStatus.OK);
     }
 
     /**

@@ -53,21 +53,15 @@ public class EntityController {
      * @paramentityId       id (primary key) of the entity to retrieve
      * @return              the retrieved entity if found in the database, null otherwise
      */
-    public Entity getEntityById(Class<?> entityClass, int entityId) {
+    public Entity getEntityById(Class<? extends Entity> entityClass, int entityId) {
         Session session = sessionFactory.openSession();
         Entity entity = null;
         
-        try{
-            session.beginTransaction();
-            entity = (Entity) session.get(entityClass, entityId);
-            session.getTransaction().commit();
-            session.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-            session.close();
-        }
+        session.beginTransaction();
+        entity = (Entity) session.get(entityClass, entityId);
+        session.getTransaction().commit();
+        session.close();
+        
         return entity;
     }
     
