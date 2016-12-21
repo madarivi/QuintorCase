@@ -8,6 +8,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import studycase.database.entities.Album;
@@ -22,27 +24,11 @@ import studycase.database.entities.Song;
  *
  */
 @Component
-public class EntityController {
+public class EntityController implements InitializingBean, DisposableBean{
     
-    private static EntityController instance;
-    public static EntityController getInstance() {
-        if (instance == null) instance = new EntityController();
-        return instance;
-    }
+    private ServiceRegistry serviceRegistry;
+    private SessionFactory sessionFactory;
     
-    private final ServiceRegistry serviceRegistry;
-    private final SessionFactory sessionFactory;
-    
-    /**
-     * constructor sets up a sessionFactory;
-     */
-    private EntityController() {
-        Configuration conf = new Configuration();
-        conf.configure();
-        serviceRegistry = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
-        sessionFactory = conf.buildSessionFactory(serviceRegistry);
-        System.out.println("configuration and hbm files loaded succesfully");
-    }
     
     // get from the database //
     
@@ -63,6 +49,21 @@ public class EntityController {
         session.close();
         
         return entity;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Entity> getEntities(Class<? extends Entity> entityClass) {
+        List<Entity> entities;
+        String queryString = "from " + entityClass.getSimpleName();
+        
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        Query query = session.createQuery(queryString);
+        entities = query.list();
+        session.getTransaction().commit();
+        session.close();
+        
+        return entities;
     }
     
     /**
@@ -147,39 +148,28 @@ public class EntityController {
     /**
      * Add an entity to the database
      * 
-     * @param entity entity to add
-     * @return true if the entity is succesfully added, false otherwise
+     * @param   entity entity to add
      */
-    private boolean addEntity(Entity entity) {
+    private void addEntity(Entity entity) {
         Session session = sessionFactory.openSession();
         
-        try {
-            session.beginTransaction();
-            session.save(entity);
-            session.getTransaction().commit();
-            session.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-            session.close();
-        }
-        
-        return true;
+        session.beginTransaction();
+        session.save(entity);
+        session.getTransaction().commit();
+        session.close();
     }
     
     /**
      * Add an artist to the artists table
      * 
-     * @param artistName name of the artist
-     * @return the artist if succesfully added, null otherwise
+     * @param artistName    name of the artist
+     * @return              the Artist object 
      */
     public Artist addArtist(String artistName) {
         Artist artist = new Artist(artistName);
-        boolean added = addEntity(artist);
+        addEntity(artist);
         
-        if (added) return artist;
-        return null;
+        return artist;
     }
     
     /**
@@ -190,10 +180,9 @@ public class EntityController {
      */
     public Album addAlbum(Artist artist, String albumName) {
         Album album = artist.makeAlbum(albumName);
-        boolean added = addEntity(album);
+        addEntity(album);
         
-        if (added) return album;
-        return null;
+        return album;
     }
     
     /**
@@ -204,10 +193,9 @@ public class EntityController {
      */
     public Song addSong(Album album, String songName) {
         Song song = album.makeSong(songName);
-        boolean added = addEntity(song);
+        addEntity(song);
         
-        if (added) return song;
-        return null;
+        return song;
     }
 
     
@@ -233,7 +221,18 @@ public class EntityController {
         return true;
     }
     
-    public void close() {
+    
+    // Bean utilities //
+    
+
+    public void afterPropertiesSet() throws Exception {
+        Configuration conf = new Configuration();
+        conf.configure();
+        serviceRegistry = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
+        sessionFactory = conf.buildSessionFactory(serviceRegistry);
+    }
+
+    public void destroy() throws Exception {
         sessionFactory.close();
         StandardServiceRegistryBuilder.destroy(serviceRegistry);
     }
