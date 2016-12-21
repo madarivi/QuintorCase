@@ -1,4 +1,4 @@
-package studycase.entities;
+package studycase.database.entities;
 
 /**
  * @author Marius
@@ -21,7 +21,7 @@ public class Artist extends Entity{
     /**
      * @param artistName
      */
-    Artist(String artistName) {
+    public Artist(String artistName) {
         this.artistName = artistName;
     }
     

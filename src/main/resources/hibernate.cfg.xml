@@ -19,11 +19,11 @@
 		
 		<!--  mapping files -->
 		<mapping resource="Artist.hbm.xml"/>
-		<mapping class="studycase.entities.Artist"/>
+		<mapping class="studycase.database.entities.Artist"/>
 		<mapping resource="Album.hbm.xml"/>
-		<mapping class="studycase.entities.Album"/>
+		<mapping class="studycase.database.entities.Album"/>
 		<mapping resource="Song.hbm.xml"/>
-		<mapping class="studycase.entities.Song"/>
+		<mapping class="studycase.database.entities.Song"/>
 		
 	</session-factory>
 </hibernate-configuration>

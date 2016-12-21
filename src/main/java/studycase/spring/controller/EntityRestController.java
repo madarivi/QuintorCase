@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import studycase.entities.Artist;
-import studycase.entities.EntityController;
+import studycase.database.EntityController;
+import studycase.database.entities.Artist;
 
 @RestController
-public class ArtistRestController {
+public class EntityRestController {
     
     @Autowired 
     EntityController entityController;

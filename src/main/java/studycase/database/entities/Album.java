@@ -1,7 +1,7 @@
 /**
  * 
  */
-package studycase.entities;
+package studycase.database.entities;
 
 /**
  * @author Marius
@@ -37,7 +37,7 @@ public class Album extends Entity{
      * @param songName the name of the song
      * @return Song entity with name songName associated with this Album entity
      */
-    Song makeSong(String songName) {
+    public Song makeSong(String songName) {
         Song song = new Song(songName, this);
         return song;
     }

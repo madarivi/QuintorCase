@@ -1,4 +1,4 @@
-package studycase.entities;
+package studycase.database.entities;
 
 /**
  * @author Marius

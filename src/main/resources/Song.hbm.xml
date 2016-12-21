@@ -2,12 +2,12 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
  <hibernate-mapping>
- 	<class name="studycase.entities.Song" table="songs" lazy="false">
+ 	<class name="studycase.database.entities.Song" table="songs" lazy="false">
  		<id name="songId" column="song_id" type="int">
  			<generator class="increment"/>
  		</id>
  		<property name="songName" column="song_name" type="string"/>
- 		<many-to-one name="album" class="studycase.entities.Album" fetch="select">
+ 		<many-to-one name="album" class="studycase.database.entities.Album" fetch="select">
  			<column name="album_id" not-null="true"/>
  		</many-to-one>
  	</class>

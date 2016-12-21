@@ -1,4 +1,4 @@
-package studycase.entities;
+package studycase.database;
 
 import java.util.List;
 
@@ -9,6 +9,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.springframework.stereotype.Component;
+
+import studycase.database.entities.Album;
+import studycase.database.entities.Artist;
+import studycase.database.entities.Entity;
+import studycase.database.entities.Song;
 
 /**
  * @author Marius
