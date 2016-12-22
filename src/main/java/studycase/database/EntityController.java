@@ -20,7 +20,7 @@ import studycase.database.entities.Song;
 /**
  * @author Marius
  * 
- * Controller for hibernate entities
+ * Controller for Hibernate entities
  *
  */
 @Component
@@ -35,8 +35,8 @@ public class EntityController implements InitializingBean, DisposableBean{
     /**
      * Get an entity from the database by id
      * 
-     * @param entityClass   class of the entity to retrieve
-     * @paramentityId       id (primary key) of the entity to retrieve
+     * @param entityClass   class of the entity
+     * @param entityId      id (primary key) of the entity
      * @return              the retrieved entity if found in the database, null otherwise
      */
     public Entity getEntityById(Class<? extends Entity> entityClass, int entityId) {
@@ -51,6 +51,12 @@ public class EntityController implements InitializingBean, DisposableBean{
         return entity;
     }
     
+    /**
+     * Get a table from the database
+     * 
+     * @param entityClass   class of the entities to retrieve
+     * @return              List of entities
+     */
     @SuppressWarnings("unchecked")
     public List<Entity> getEntities(Class<? extends Entity> entityClass) {
         List<Entity> entities;
@@ -201,22 +207,22 @@ public class EntityController implements InitializingBean, DisposableBean{
     
     // Delete from the database //
     
-    public boolean deleteArtist(int id) {
+    /**
+     * Delete an entity from the database by id
+     * 
+     * @param entityClass   class of the entity
+     * @param entityId      id (primary key) of the entity
+     * @return              true if the entity was successfully found and deleted, false otherwise
+     */
+    public boolean deleteEntityById(Class<? extends Entity> entityClass, int id) {
         Session session = sessionFactory.openSession();
         
-        try {
-            session.beginTransaction();
-            Artist artist = (Artist) session.get(Artist.class, id);
-            session.delete(artist);
-            session.getTransaction().commit();
-            session.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-            session.close();
-            return false;
-        }
+        session.beginTransaction();
+        Entity entity = (Entity) session.get(entityClass, id);
+        if (entity == null) return false;
+        session.delete(entity);
+        session.getTransaction().commit();
+        session.close();
         
         return true;
     }
@@ -224,7 +230,6 @@ public class EntityController implements InitializingBean, DisposableBean{
     
     // Bean utilities //
     
-
     public void afterPropertiesSet() throws Exception {
         Configuration conf = new Configuration();
         conf.configure();

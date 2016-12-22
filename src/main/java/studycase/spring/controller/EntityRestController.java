@@ -29,10 +29,10 @@ public class EntityRestController {
      * Get all entities from a table
      * 
      * @param table     the name of the table to retrieve from
-     * @return          ResponseEntity with status INTERNAL_SERVER_ERROR ->
-     *                      something went wrong with the database access
-     *                  ResponseEntity with status BAD_REQUEST ->
+     * @return          ResponseEntity with status BAD_REQUEST ->
      *                      table was not recognized
+     *                  ResponseEntity with status INTERNAL_SERVER_ERROR ->
+     *                      something went wrong with the database access
      *                  ResponseEntity with status NO_CONTENT -> 
      *                      the entity list was empty
      *                  ResponseEntity with status OK and the list of Entity objects ->
@@ -64,10 +64,10 @@ public class EntityRestController {
      * 
      * @param table     the name of the table to retrieve from
      * @param id        the id of the entity
-     * @return          ResponseEntity with status INTERNAL_SERVER_ERROR ->
-     *                      something went wrong with the database access
-     *                  ResponseEntity with status BAD_REQUEST ->
+     * @return          ResponseEntity with status BAD_REQUEST ->
      *                      table was not recognized
+     *                  ResponseEntity with status INTERNAL_SERVER_ERROR ->
+     *                      something went wrong with the database access
      *                  ResponseEntity with status NO_CONTENT -> 
      *                      the entity was not found
      *                  ResponseEntity with status OK and the Entity object ->
@@ -199,24 +199,41 @@ public class EntityRestController {
             
         return new ResponseEntity<Song>(song, HttpStatus.CREATED);
     }
-    
-
-
+   
     /**
-     * Delete an artist from the database
+     * Delete an entity from the database
      * 
-     * @param id    the id of the artist
-     * @return      ResponseEntity with status NOT_FOUND ->
-     *                  the artist was not found or an error occurred
-     *              ResponseEntity with status ACCEPTED ->
-     *                  the artist was successfully deleted
+     * @param table     the name of the table to delete from
+     * @param id        the id of the entity
+     * @return          ResponseEntity with status BAD_REQUEST ->
+     *                      table was not recognized
+     *                  ResponseEntity with status INTERNAL_SERVER_ERROR ->
+     *                      something went wrong with the database access
+     *                  ResponseEntity with status NO_CONTENT -> 
+     *                      the entity was not found
+     *                  ResponseEntity with status OK and the Entity object ->
+     *                      the entity was successfully deleted
      */
-    @DeleteMapping("/artists/{id}")
-    public ResponseEntity<Void> deleteArtist(@PathVariable int id) {
-
-        if(entityController.deleteArtist(id)) return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
-
-        return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
-
+    @DeleteMapping("/{table}/{id}")
+    public ResponseEntity<Void> deleteArtist(   @PathVariable("table") String table,
+                                                @PathVariable("id") int id
+                                            ) {
+        
+            EntityEnum entityEnum = EntityEnum.fromString(table);
+            if (entityEnum == null) return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+            
+            boolean deleted;
+            try {
+                deleted = entityController.deleteEntityById(entityEnum.getEntityClass(), id);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            if (!deleted) {
+                return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+            }
+            
+            return new ResponseEntity<Void>(HttpStatus.OK);
     }
 }
