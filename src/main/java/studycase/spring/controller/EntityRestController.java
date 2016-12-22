@@ -129,8 +129,7 @@ public class EntityRestController {
     /**
      * Create a new album in the database
      *
-     * @param artistId  the id of the associated artist - precondition: exists in the database
-     * @param album     the album to add                - precondition: not null AND albumName.length > 0
+     * @param album     the album to add - precondition: not null AND albumName.length > 0
      * @return          ResponseEntity with status BAD_REQUEST ->
      *                      the precondition failed
      *                  ResponseEntity with status INTERNAL_SERVER_ERROR ->
@@ -138,21 +137,19 @@ public class EntityRestController {
      *                  ResponseEntity with status CREATED and the saved album object ->
      *                      the album was successfully created
      */
-    @PostMapping(value = "/artists/{id}")
-    public ResponseEntity<Album> createAlbum(   @PathVariable("id") int artistId,
-                                                @RequestBody Album albumIn
-                                            ) {
+    @PostMapping(value = "/albums")
+    public ResponseEntity<Album> createAlbum(@RequestBody Album albumIn) {
         
         if (    albumIn == null || 
                 albumIn.getAlbumName() == null ||
                 albumIn.getAlbumName().length() == 0) {
-            return new ResponseEntity<Album>(HttpStatus.I_AM_A_TEAPOT);
+            return new ResponseEntity<Album>(HttpStatus.BAD_REQUEST);
         }
         
         Artist artist;
         Album album;
         try {
-            artist = (Artist) entityController.getEntityById(Artist.class, artistId);
+            artist = (Artist) entityController.getEntityById(Artist.class, albumIn.getArtist().getArtistId());
             if (artist == null) return new ResponseEntity<Album>(HttpStatus.BAD_REQUEST);
             album = entityController.addAlbum(artist, albumIn.getAlbumName());
         }
@@ -166,8 +163,7 @@ public class EntityRestController {
     /**
      * Create a new song in the database
      *
-     * @param albumId  the id of the associated album - precondition: exists in the database
-     * @param song     the song to add                - precondition: not null AND songName.length > 0
+     * @param song     the song to add - precondition: not null AND songName.length > 0
      * @return          ResponseEntity with status BAD_REQUEST ->
      *                      the precondition failed
      *                  ResponseEntity with status INTERNAL_SERVER_ERROR ->
@@ -175,10 +171,8 @@ public class EntityRestController {
      *                  ResponseEntity with status CREATED and the saved song object ->
      *                      the song was successfully created
      */
-    @PostMapping(value = "/albums/{id}")
-    public ResponseEntity<Song> createSong(   @PathVariable("id") int albumId,
-                                                @RequestBody Song songIn
-                                            ) {
+    @PostMapping(value = "/songs")
+    public ResponseEntity<Song> createSong(@RequestBody Song songIn) {
         
         if (    songIn == null || 
                 songIn.getSongName() == null ||
@@ -189,7 +183,7 @@ public class EntityRestController {
         Album album;
         Song song;
         try {
-            album = (Album) entityController.getEntityById(Album.class, albumId);
+            album = (Album) entityController.getEntityById(Album.class, songIn.getAlbum().getAlbumId());
             if (album == null) return new ResponseEntity<Song>(HttpStatus.BAD_REQUEST);
             song = entityController.addSong(album, songIn.getSongName());
         }
