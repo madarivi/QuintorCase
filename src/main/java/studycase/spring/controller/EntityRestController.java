@@ -38,7 +38,7 @@ public class EntityRestController {
      *                  ResponseEntity with status OK and the list of Entity objects ->
      *                      the table was successfully retrieved
      */
-    @GetMapping("/{table}")
+    @GetMapping("/api/{table}")
     public ResponseEntity<List<Entity>> getEntities(@PathVariable("table") String table) {
         
         EntityEnum entityEnum = EntityEnum.fromString(table);
@@ -73,7 +73,7 @@ public class EntityRestController {
      *                  ResponseEntity with status OK and the Entity object ->
      *                      the entity was successfully retrieved
      */
-    @GetMapping("/{table}/{id}")
+    @GetMapping("/api/{table}/{id}")
     public ResponseEntity<Entity> getEntity(    @PathVariable("table") String table,
                                                 @PathVariable("id") int id) {
         
@@ -106,7 +106,7 @@ public class EntityRestController {
      *                  ResponseEntity with status CREATED and the saved artist object ->
      *                      the artist was successfully created
      */
-    @PostMapping(value = "/artists")
+    @PostMapping(value = "/api/artists")
     public ResponseEntity<Artist> createArtist(@RequestBody Artist artistIn) {
         
         if (    artistIn == null || 
@@ -137,7 +137,7 @@ public class EntityRestController {
      *                  ResponseEntity with status CREATED and the saved album object ->
      *                      the album was successfully created
      */
-    @PostMapping(value = "/albums")
+    @PostMapping(value = "/api/albums")
     public ResponseEntity<Album> createAlbum(@RequestBody Album albumIn) {
         
         if (    albumIn == null || 
@@ -171,7 +171,7 @@ public class EntityRestController {
      *                  ResponseEntity with status CREATED and the saved song object ->
      *                      the song was successfully created
      */
-    @PostMapping(value = "/songs")
+    @PostMapping(value = "/api/songs")
     public ResponseEntity<Song> createSong(@RequestBody Song songIn) {
         
         if (    songIn == null || 
@@ -208,7 +208,7 @@ public class EntityRestController {
      *                  ResponseEntity with status OK and the Entity object ->
      *                      the entity was successfully deleted
      */
-    @DeleteMapping("/{table}/{id}")
+    @DeleteMapping("/api/{table}/{id}")
     public ResponseEntity<Void> deleteArtist(   @PathVariable("table") String table,
                                                 @PathVariable("id") int id
                                             ) {

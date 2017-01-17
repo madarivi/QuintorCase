@@ -1,0 +1,11 @@
+<ul>
+    <li ng-repeat="artist in $ctrl.artists">
+        <span>{{artist.artistName + artist.artistId}}</span>
+        <button ng-click="$ctrl.deleteArtist(artist)">Delete</button>
+    </li>
+    <li>
+        <label for="newArtist"></label>
+        <input type="text" ng-model="$ctrl.newArtist.artistName" id="newArtist">
+        <button ng-click="$ctrl.addArtist()">Add</button>
+    </li>
+</ul>

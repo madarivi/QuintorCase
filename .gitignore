@@ -50,3 +50,6 @@ local.properties
 
 # Code Recommenders
 .recommenders/
+
+# Webstorm folder
+.idea/
