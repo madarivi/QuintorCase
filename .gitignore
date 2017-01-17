@@ -53,3 +53,6 @@ local.properties
 
 # Webstorm folder
 .idea/
+
+# index html for web development
+src/main/webapp/index.html

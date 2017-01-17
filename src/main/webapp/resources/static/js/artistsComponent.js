@@ -5,7 +5,7 @@ angular.module('MusicDatabaseApp')
         templateUrl: 'resources/static/views/artists.template.html',
         controller: function ArtistController($http, restController) {
             var self = this;
-            var restUrl = 'api/artists/';
+            var restUrl = 'http://localhost:8080/study-case/api/artists/';
 
             this.artists = [];
             this.newArtist={artistName:""};
