@@ -1,4 +1,4 @@
-package studycase.database;
+package studycase.database.service;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import studycase.database.entities.Album;
 import studycase.database.entities.Artist;
@@ -23,8 +23,8 @@ import studycase.database.entities.Song;
  * Controller for Hibernate entities
  *
  */
-@Component
-public class EntityController implements InitializingBean, DisposableBean{
+@Service
+public class EntityServiceImpl implements EntityService, InitializingBean, DisposableBean{
     
     private ServiceRegistry serviceRegistry;
     private SessionFactory sessionFactory;

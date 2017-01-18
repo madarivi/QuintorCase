@@ -13,19 +13,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import studycase.database.EntityController;
-import studycase.database.EntityEnum;
 import studycase.database.entities.Album;
 import studycase.database.entities.Artist;
 import studycase.database.entities.Entity;
+import studycase.database.entities.EntityEnum;
 import studycase.database.entities.Song;
+import studycase.database.service.EntityService;
 
 @CrossOrigin(origins = "http://localhost:5555")
 @RestController
 public class EntityRestController {
     
     @Autowired 
-    EntityController entityController;
+    EntityService entityService;
     
     /**
      * Get all entities from a table
@@ -48,7 +48,7 @@ public class EntityRestController {
         
         List<Entity> entities;
         try {
-            entities = entityController.getEntities(entityEnum.getEntityClass());
+            entities = entityService.getEntities(entityEnum.getEntityClass());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -84,7 +84,7 @@ public class EntityRestController {
         
         Entity entity;
         try {
-            entity = entityController.getEntityById(entityEnum.getEntityClass(), id);
+            entity = entityService.getEntityById(entityEnum.getEntityClass(), id);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -119,7 +119,7 @@ public class EntityRestController {
         
         Artist artist;
         try {
-            artist = entityController.addArtist(artistIn.getArtistName());
+            artist = entityService.addArtist(artistIn.getArtistName());
         }
         catch (Exception e) {
             return new ResponseEntity<Artist>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -151,9 +151,9 @@ public class EntityRestController {
         Artist artist;
         Album album;
         try {
-            artist = (Artist) entityController.getEntityById(Artist.class, albumIn.getArtist().getArtistId());
+            artist = (Artist) entityService.getEntityById(Artist.class, albumIn.getArtist().getArtistId());
             if (artist == null) return new ResponseEntity<Album>(HttpStatus.BAD_REQUEST);
-            album = entityController.addAlbum(artist, albumIn.getAlbumName());
+            album = entityService.addAlbum(artist, albumIn.getAlbumName());
         }
         catch (Exception e) {
             return new ResponseEntity<Album>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -185,9 +185,9 @@ public class EntityRestController {
         Album album;
         Song song;
         try {
-            album = (Album) entityController.getEntityById(Album.class, songIn.getAlbum().getAlbumId());
+            album = (Album) entityService.getEntityById(Album.class, songIn.getAlbum().getAlbumId());
             if (album == null) return new ResponseEntity<Song>(HttpStatus.BAD_REQUEST);
-            song = entityController.addSong(album, songIn.getSongName());
+            song = entityService.addSong(album, songIn.getSongName());
         }
         catch (Exception e) {
             return new ResponseEntity<Song>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -220,7 +220,7 @@ public class EntityRestController {
             
             boolean deleted;
             try {
-                deleted = entityController.deleteEntityById(entityEnum.getEntityClass(), id);
+                deleted = entityService.deleteEntityById(entityEnum.getEntityClass(), id);
             }
             catch (Exception e) {
                 e.printStackTrace();

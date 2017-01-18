@@ -1,9 +1,4 @@
-package studycase.database;
-
-import studycase.database.entities.Album;
-import studycase.database.entities.Artist;
-import studycase.database.entities.Entity;
-import studycase.database.entities.Song;
+package studycase.database.entities;
 
 public enum EntityEnum {
     ARTISTS(Artist.class),

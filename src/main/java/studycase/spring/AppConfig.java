@@ -1,25 +1,26 @@
 package studycase.spring;
 
-import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
-public class AppInitializer implements WebApplicationInitializer {
+import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
+
+import studycase.spring.config.AppContext;
+
+public class AppConfig implements WebApplicationInitializer {
 
     private static final String CONFIG_LOCATION = "studycase.spring.config";
 
     public void onStartup(ServletContext servletContext) throws ServletException {
-        System.out.println("***** Initializing Application for " + servletContext.getServerInfo() + " *****");
 
         // Create ApplicationContext
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
-        applicationContext.setConfigLocation(CONFIG_LOCATION);
+        applicationContext.register(AppContext.class);
 
-        // Add the servlet mapping manually and make it initialize automatically
+        // Creat DispatcherServlet and Add to the Servlet context
         DispatcherServlet dispatcherServlet = new DispatcherServlet(applicationContext);
         ServletRegistration.Dynamic servlet = servletContext.addServlet("mvc-dispatcher", dispatcherServlet);
 

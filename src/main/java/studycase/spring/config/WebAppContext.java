@@ -10,10 +10,10 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-@EnableWebMvc
 @Configuration
-@ComponentScan("studycase")
-public class AppConfig extends WebMvcConfigurerAdapter{
+@EnableWebMvc
+@ComponentScan(basePackages = "studycase.spring.controller")
+public class WebAppContext extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -38,4 +38,3 @@ public class AppConfig extends WebMvcConfigurerAdapter{
         configurer.enable();
     }
 }
-
