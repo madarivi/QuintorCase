@@ -4,11 +4,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
     <script src="resources/static/js/app.js"></script>
     <script src="resources/static/js/restController.js"></script>
-    <script src="resources/static/js/artistsComponent.js"></script>
+    <script src="resources/static/js/entities.component.js"></script>
 </head>
 <body>
 
-    <artists></artists>
+<entities></entities>
 
 </body>
 </html>

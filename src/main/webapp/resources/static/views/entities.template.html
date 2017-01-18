@@ -1,0 +1,24 @@
+<select ng-model="$ctrl.entityType" ng-change="$ctrl.getEntities()">
+    <option value='artist'>Artists</option>
+    <option value='album'>Albums</option>
+    <option value='song'>Songs</option>
+</select>
+
+<ul>
+    <li ng-repeat="entity in $ctrl.entities">
+    <!-- <li ng-repeat="entity in $ctrl.entities | filter:$ctrl.parent"> -->
+
+        <span>{{entity[$ctrl.nameField]}},  {{entity.artistId}}</span>
+        <button ng-click="$ctrl.deleteEntity(entity)">Delete</button>
+        <button ng-click="">Go Into</button>
+    </li>
+    <li ng-if="$ctrl.showAdd">
+        <label for="newEntity"></label>
+        <input type="text" ng-model="$ctrl.newEntityName" id="newEntity">
+        <button ng-click="$ctrl.addEntity()">Add</button>
+    </li>
+    <li>
+        <input type="checkbox" ng-model="$ctrl.showAdd">
+        <span>{{parent}}</span>
+    </li>
+</ul>

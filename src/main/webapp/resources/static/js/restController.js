@@ -5,7 +5,6 @@ angular.module('MusicDatabaseApp')
 
         var factory = {
             restUrl: '',
-            entities: [],
             initEntities: initEntities,
             addEntity: addEntity,
             deleteEntity: deleteEntity
@@ -17,22 +16,20 @@ angular.module('MusicDatabaseApp')
             var deferred = $q.defer();
             $http.get(this.restUrl)
                 .then(function success(response) {
-                    factory.entities = response.data;
-                    deferred.resolve();
+                    deferred.resolve(response.data);
                 }, function error(response) {
                     var prefix = 'error get http request';
                     console.error(prefix, response.status);
                     deferred.reject();
                 });
             return deferred.promise;
-        };
+        }
 
         function addEntity(entity) {
             var deferred = $q.defer();
             $http.post(this.restUrl, entity)
                 .then(function success(response) {
-                    factory.entities.push(response.data);
-                    deferred.resolve();
+                    deferred.resolve(response.data);
                 }, function error(response) {
                     var prefix = 'error post http request';
                     console.error(prefix, response.status);
@@ -41,20 +38,19 @@ angular.module('MusicDatabaseApp')
             return deferred.promise;
         };
 
-        function deleteEntity(entity, id) {
+        function deleteEntity(id) {
             var deferred = $q.defer();
             $http.delete(this.restUrl + id)
                 .then(function success(response) {
                     if (response.status === 200) {
-                        factory.entities.splice(factory.entities.indexOf(entity), 1);
-                        deferred.resolve();
+                        deferred.resolve(response.data);
                     } else {
-                        var prefix = 'error artist delete http request';
+                        var prefix = 'error delete http request';
                         console.error(prefix, response.status);
                         deferred.reject();
                     }
                 },function error(response) {
-                    var prefix = 'error artist delete http request';
+                    var prefix = 'error delete http request';
                     console.error(prefix, response.status);
                     deferred.reject();
                 });
