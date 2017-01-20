@@ -4,21 +4,22 @@
     <option value='song'>Songs</option>
 </select>
 
-<ul>
-    <li ng-repeat="entity in $ctrl.entities">
-    <!-- <li ng-repeat="entity in $ctrl.entities | filter:$ctrl.parent"> -->
+<br>
+<br>
 
-        <span>{{entity[$ctrl.nameField]}},  {{entity.artistId}}</span>
+<span ng-if="$ctrl.parent"><b>{{$ctrl.parentType.toUpperCase()}}:</b> {{$ctrl.parent[$ctrl.parentType + "Name"]}}</span>
+
+<ul>
+    <li ng-repeat="entity in $ctrl.entities | filter:$ctrl.filter">
+        <span>{{entity[$ctrl.nameField]}}</span>
         <button ng-click="$ctrl.deleteEntity(entity)">Delete</button>
-        <button ng-click="">Go Into</button>
-    </li>
-    <li ng-if="$ctrl.showAdd">
-        <label for="newEntity"></label>
-        <input type="text" ng-model="$ctrl.newEntityName" id="newEntity">
-        <button ng-click="$ctrl.addEntity()">Add</button>
-    </li>
-    <li>
-        <input type="checkbox" ng-model="$ctrl.showAdd">
-        <span>{{parent}}</span>
+        <button ng-click="$ctrl.goInto(entity)" ng-if="$ctrl.entityType != 'song'">Go Into</button>
     </li>
 </ul>
+
+<div ng-if="$ctrl.showAdd">
+    <label for="newEntity"></label>
+    Add
+    <input type="text" ng-model="$ctrl.newEntityName" id="newEntity">
+    <button ng-click="$ctrl.addEntity()" ng-if="$ctrl.newEntityName">Add</button>
+</div>
