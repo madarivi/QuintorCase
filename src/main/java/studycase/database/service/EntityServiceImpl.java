@@ -31,43 +31,51 @@ public class EntityServiceImpl implements EntityService, InitializingBean, Dispo
     
     
     // get from the database //
-    
-    /**
-     * Get an entity from the database by id
-     * 
-     * @param entityClass   class of the entity
-     * @param entityId      id (primary key) of the entity
-     * @return              the retrieved entity if found in the database, null otherwise
-     */
-    public Entity getEntityById(Class<? extends Entity> entityClass, int entityId) {
-        Session session = sessionFactory.openSession();
+    @Override
+    public Entity getEntityById(Class<? extends Entity> entityClass, int entityId) throws EntityServiceException{
         Entity entity = null;
         
-        session.beginTransaction();
-        entity = (Entity) session.get(entityClass, entityId);
-        session.getTransaction().commit();
-        session.close();
+        Session session = null;
+        try {
+        	session = sessionFactory.openSession();
+	        session.beginTransaction();
+	        entity = (Entity) session.get(entityClass, entityId);
+	        session.getTransaction().commit();
+	        session.close();
+        }
+        catch (Exception e) {
+        	System.err.println(e);
+        	if (session != null) session.getTransaction().rollback();
+        	throw new EntityServiceException(e);
+        }
+        finally {
+        	if (session != null) session.close();
+        }
         
         return entity;
     }
     
-    /**
-     * Get a table from the database
-     * 
-     * @param entityClass   class of the entities to retrieve
-     * @return              List of entities
-     */
     @SuppressWarnings("unchecked")
-    public List<Entity> getEntities(Class<? extends Entity> entityClass) {
+    public List<Entity> getEntities(Class<? extends Entity> entityClass) throws EntityServiceException{
         List<Entity> entities;
         String queryString = "from " + entityClass.getSimpleName();
         
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        Query query = session.createQuery(queryString);
-        entities = query.list();
-        session.getTransaction().commit();
-        session.close();
+        Session session = null;
+        try {
+        	session = sessionFactory.openSession();
+	        session.beginTransaction();
+	        Query query = session.createQuery(queryString);
+	        entities = query.list();
+	        session.getTransaction().commit();
+        }
+        catch(Exception e) {
+        	System.err.println(e);
+        	if (session != null) session.getTransaction().rollback();
+        	throw new EntityServiceException(e);
+        }
+        finally {
+        	if (session != null) session.close();
+        }
         
         return entities;
     }

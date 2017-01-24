@@ -19,6 +19,7 @@ import studycase.database.entities.Entity;
 import studycase.database.entities.EntityEnum;
 import studycase.database.entities.Song;
 import studycase.database.service.EntityService;
+import studycase.database.service.EntityServiceException;
 
 @CrossOrigin(origins = "http://localhost:5555")
 @RestController
@@ -54,8 +55,7 @@ public class EntityRestController {
         try {
             entities = entityService.getEntities(entityEnum.getEntityClass());
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        catch (EntityServiceException e) {
             return new ResponseEntity<List<Entity>>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (entities.size() == 0) {
@@ -90,7 +90,7 @@ public class EntityRestController {
         try {
             entity = entityService.getEntityById(entityEnum.getEntityClass(), id);
         }
-        catch (Exception e) {
+        catch (EntityServiceException e) {
             e.printStackTrace();
             return new ResponseEntity<Entity>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
