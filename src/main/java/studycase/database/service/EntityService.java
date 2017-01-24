@@ -32,11 +32,38 @@ public interface EntityService {
      */
 	public abstract List<Entity> getEntities(Class<? extends Entity> entityClass) throws EntityServiceException;
 	
-	public abstract boolean deleteEntityById(Class<? extends Entity> entityClass, int entityId);
+	public abstract boolean deleteEntityById(Class<? extends Entity> entityClass, int entityId) throws EntityServiceException;
 	
-	public abstract Artist addArtist(String artistName);
+	/**
+     * Add an artist to the artists table
+     * 
+     * @param artistName    name of the artist
+     * @return              the Artist object 
+     * 
+     * @throws EntityServiceException, if something went wrong getting the entities
+     * 
+     */
+	public abstract Artist addArtist(String artistName) throws EntityServiceException;
 	
-	public abstract Album addAlbum(Artist artist, String albumName);
+	/**
+     * Add an album to the albums table
+     * 
+     * @param artist artist associated with the album
+     * @param albumName name of the album 
+     * 
+     * @throws EntityServiceException, if something went wrong getting the entities
+     * 
+     */
+	public abstract Album addAlbum(Artist artist, String albumName) throws EntityServiceException;
 	
-	public abstract Song addSong(Album album, String songName);
+	/**
+     * Add a song to the songs table
+     * 
+     * @param album album associated with the song
+     * @param songName name of the song 
+     * 
+     * @throws EntityServiceException, if something went wrong getting the entities
+     * 
+     */
+	public abstract Song addSong(Album album, String songName) throws EntityServiceException;
 }

@@ -79,133 +79,46 @@ public class EntityServiceImpl implements EntityService, InitializingBean, Dispo
         
         return entities;
     }
-    
-    /**
-     * Get a list of entities from the database from an HQL query
-     * 
-     * @param queryString the HQL query
-     * @return List of entities, null if a database access error occurs
-     */
-    @SuppressWarnings("unchecked")
-    private List<Entity> getEntitiesByQuery(String queryString) {
-        Session session = sessionFactory.openSession();
-        List<Entity> entities = null;
         
-        try {
-            Query query = session.createQuery(queryString);
-            entities = query.list();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            session.getTransaction().rollback();
-            session.close();
-        }
-        return entities;
-    }
-    
-    /**
-     * Get artists from the database
-     * 
-     * @param search    the string to search for in artistName
-     * @return          List of artist entities, null if a database access error occurs
-     */
-    public List<Entity> getArtists(String search) {
-        String queryString = "from Artist";
-        if (search != null && !search.isEmpty()) queryString += " where artistName like '%" + search + "%'";
-        
-        return getEntitiesByQuery(queryString);
-    }
-    
-    /**
-     * Get albums from the database
-     * 
-     * @param search    the string to search for in albumName  (empty string -> no search)
-     * @param artistId  the artist id of the associated artist (0 -> all artists)              
-     * @return          List of album entities, null if a database access error occurs
-     */
-    public List<Entity> getAlbums(String search, int artistId) {
-        
-        String queryString = "from Album";
-        if (search != null && !search.isEmpty()) queryString += " where albumName like '%" + search + "%'";
-        if (artistId > 0) {
-            if (queryString.equals("from Album")) queryString += " where";
-            else queryString += " and";
-            queryString += " artist.artistId = " + artistId;
-        }
-        
-        System.out.println(queryString);
-        return getEntitiesByQuery(queryString);
-    }
-    
-    /**
-     * Get songs from the database
-     * 
-     * @param search    the string to search for in songName  (empty string -> no search)
-     * @param albumId   the albumt id of the associated album (0 -> all albums)              
-     * @return          List of song entities, null if a database access error occurs
-     */
-    public List<Entity> getSongs(String search, int albumId) {
-        String queryString = "from Song";
-        if (search != null && !search.isEmpty()) queryString += " where songName like '%" + search + "%'";
-        if (albumId > 0) {
-            if (queryString.equals("from Song")) queryString += " where";
-            else queryString += " and";
-            queryString += " album.albumId = " + albumId;
-        }
-        
-        return getEntitiesByQuery(queryString);
-    }
-    
 
     // Add to the database //
-    
-    /**
-     * Add an entity to the database
-     * 
-     * @param   entity entity to add
-     */
-    private void addEntity(Entity entity) {
-        Session session = sessionFactory.openSession();
+    private void addEntity(Entity entity) throws EntityServiceException {
         
-        session.beginTransaction();
-        session.save(entity);
-        session.getTransaction().commit();
-        session.close();
+    	Session session = null;
+        try {
+	        session = sessionFactory.openSession();
+	        session.beginTransaction();
+	        session.save(entity);
+	        session.getTransaction().commit();
+        }
+        catch(Exception e) {
+        	System.err.println(e);
+        	if (session != null) session.getTransaction().rollback();
+        	throw new EntityServiceException(e);
+        }
+        finally {
+        	if (session != null) session.close();
+        }
     }
     
-    /**
-     * Add an artist to the artists table
-     * 
-     * @param artistName    name of the artist
-     * @return              the Artist object 
-     */
-    public Artist addArtist(String artistName) {
+    @Override
+    public Artist addArtist(String artistName) throws EntityServiceException {
         Artist artist = new Artist(artistName);
         addEntity(artist);
         
         return artist;
     }
     
-    /**
-     * Add an album to the albums table
-     * 
-     * @param artist artist associated with the album
-     * @param albumName name of the album
-     */
-    public Album addAlbum(Artist artist, String albumName) {
+    @Override
+    public Album addAlbum(Artist artist, String albumName) throws EntityServiceException {
         Album album = artist.makeAlbum(albumName);
         addEntity(album);
         
         return album;
     }
     
-    /**
-     * Add a song to the songs table
-     * 
-     * @param album album associated with the song
-     * @param songName name of the song
-     */
-    public Song addSong(Album album, String songName) {
+    @Override
+    public Song addSong(Album album, String songName) throws EntityServiceException {
         Song song = album.makeSong(songName);
         addEntity(song);
         

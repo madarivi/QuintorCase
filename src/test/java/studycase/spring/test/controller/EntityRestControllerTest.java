@@ -1,16 +1,11 @@
 package studycase.spring.test.controller;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +22,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import studycase.database.entities.Album;
 import studycase.database.entities.Artist;
@@ -91,6 +90,7 @@ public class EntityRestControllerTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 	
+    
     // test getEntities //
     @Test
     public void testGetEntities_IncorrectTableName() throws Exception {
@@ -103,7 +103,7 @@ public class EntityRestControllerTest {
     }
     
     @Test
-    public void testGetEntities_DatabaseAccessThrowsException() throws Exception {
+    public void testGetEntities_ServiceAccessThrowsException() throws Exception {
     	String tableName = "artists/";
     	
     	when(entityServiceMock.getEntities(Artist.class))
@@ -186,7 +186,7 @@ public class EntityRestControllerTest {
 	}
 	
     @Test
-    public void testGetEntity_DatabaseAccessThrowsException() throws Exception {
+    public void testGetEntity_ServiceAccessThrowsException() throws Exception {
     	String tableName = "artists/";
     	int id = 1;
     	
@@ -254,4 +254,333 @@ public class EntityRestControllerTest {
 		verify(entityServiceMock, times(1)).getEntityById(Song.class, id);	
     	verifyNoMoreInteractions(entityServiceMock);
 	}
+
+
+	// test addArtist
+	@Test
+	public void testAddArtist_InvalidObjectNotAnArtist() throws Exception{
+		String tableName = "artists/";
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(new String()))
+				)
+				.andExpect(status().isBadRequest());
+		
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddArtist_InvalidObjectArtistNameZeroLength() throws Exception{
+		String tableName = "artists/";
+		
+		Artist artist = new Artist("");
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(artist))
+				)
+				.andExpect(status().isBadRequest());
+		
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddArtist_ServiceAccessThrowsException() throws Exception{
+		String tableName = "artists/";
+		
+		Artist artist = (Artist) artists.get(0);
+
+    	when(entityServiceMock.addArtist(artist.getArtistName()))
+    		.thenThrow(new EntityServiceException(new Exception("test exception")));
+		
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(artist))
+				)
+				.andExpect(status().isInternalServerError());
+		
+		verify(entityServiceMock, times(1)).addArtist("one1");
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddArtist_SuccesfullyAdded() throws Exception{
+		String tableName = "artists/";
+		
+		Artist artist = (Artist) artists.get(0);
+		artist.setArtistId(1);
+		
+		when(entityServiceMock.addArtist(artist.getArtistName()))
+			.thenReturn(artist);
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(artist))
+				)
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.artistName", is("one1")))
+				.andExpect(jsonPath("$.artistId", is(1)));
+
+		verify(entityServiceMock, times(1)).addArtist("one1");
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	// test addAlbum
+	@Test
+	public void testAddAlbum_InvalidObjectNotAnAlbum() throws Exception{
+		String tableName = "albums/";
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(new String()))
+				)
+				.andExpect(status().isBadRequest());
+		
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddAlbum_InvalidObjectAlbumNameZeroLength() throws Exception{
+		String tableName = "albums/";
+		
+		Artist artist = (Artist) artists.get(0);
+		Album album = artist.makeAlbum("");
+		
+		when(entityServiceMock.getEntityById(Artist.class, artist.getArtistId()))
+			.thenReturn(artist);
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(album))
+				)
+				.andExpect(status().isBadRequest());
+
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddAlbum_InvalidObjectArtistNotFound() throws Exception{
+		String tableName = "albums/";
+		
+		Artist artist = (Artist) artists.get(0);
+		Album album = (Album) albums.get(0);
+
+		when(entityServiceMock.getEntityById(Artist.class, artist.getArtistId()))
+			.thenReturn(null);
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(album))
+				)
+				.andExpect(status().isBadRequest());
+		
+		verify(entityServiceMock, times(1)).getEntityById(Artist.class, artist.getArtistId());
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	
+	@Test
+	public void testAddAlbum_ServiceAccessFindArtistThrowsException() throws Exception{
+		String tableName = "albums/";
+
+		Artist artist = (Artist) artists.get(0);
+		Album album = (Album) albums.get(0);
+		
+		when(entityServiceMock.getEntityById(Artist.class, artist.getArtistId()))
+			.thenThrow(new EntityServiceException(new Exception("test exception")));
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(album))
+				)
+				.andExpect(status().isInternalServerError());
+		
+		verify(entityServiceMock, times(1)).getEntityById(Artist.class, artist.getArtistId());
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddAlbum_ServiceAccessAddAlbumThrowsException() throws Exception{
+		String tableName = "albums/";
+
+		Artist artist = (Artist) artists.get(0);
+		Album album = (Album) albums.get(0);
+		
+		when(entityServiceMock.getEntityById(Artist.class, artist.getArtistId()))
+			.thenReturn(artist);
+		when(entityServiceMock.addAlbum(artist, album.getAlbumName()))
+			.thenThrow(new EntityServiceException(new Exception("test exception")));
+		
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(album))
+				)
+				.andExpect(status().isInternalServerError());
+		
+		verify(entityServiceMock, times(1)).getEntityById(Artist.class, artist.getArtistId());
+		verify(entityServiceMock, times(1)).addAlbum(artist, "a1");
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	
+	@Test
+	public void testAddAlbum_SuccesfullyAdded() throws Exception{
+		String tableName = "albums/";
+
+		Artist artist = (Artist) artists.get(0);
+		Album album = (Album) albums.get(0);
+		
+		when(entityServiceMock.getEntityById(Artist.class, artist.getArtistId()))
+			.thenReturn(artist);
+		when(entityServiceMock.addAlbum(artist, album.getAlbumName()))
+			.thenReturn(album);
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(album))
+				)
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.albumName", is("a1")))
+				.andExpect(jsonPath("$.albumId", is(1)))
+				.andExpect(jsonPath("$.artist.artistName", is("one1")))
+				.andExpect(jsonPath("$.artist.artistId", is(1)));
+		
+		verify(entityServiceMock, times(1)).getEntityById(Artist.class, artist.getArtistId());
+		verify(entityServiceMock, times(1)).addAlbum(artist, "a1");
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	// helper method for converting object to JSON //
+	
+	public static byte[] convertObjectToJson(Object object) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return mapper.writeValueAsBytes(object);
+    }
+
+	// test addSong
+	@Test
+	public void testAddSong_InvalidObjectNotAnSong() throws Exception{
+		String tableName = "songs/";
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(new String()))
+				)
+				.andExpect(status().isBadRequest());
+		
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddSong_InvalidObjectSongNameZeroLength() throws Exception{
+		String tableName = "songs/";
+		
+		Album album = (Album) albums.get(0);
+		Song song = album.makeSong("");
+		
+		when(entityServiceMock.getEntityById(Album.class, album.getAlbumId()))
+			.thenReturn(album);
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(song))
+				)
+				.andExpect(status().isBadRequest());
+
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddSong_InvalidObjectAlbumNotFound() throws Exception{
+		String tableName = "songs/";
+		
+		Album album = (Album) albums.get(0);
+
+		when(entityServiceMock.getEntityById(Album.class, album.getAlbumId()))
+			.thenReturn(null);
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(song))
+				)
+				.andExpect(status().isBadRequest());
+		
+		verify(entityServiceMock, times(1)).getEntityById(Album.class, album.getAlbumId());
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddSong_ServiceAccessFindAlbumThrowsException() throws Exception{
+		String tableName = "songs/";
+
+		Album album = (Album) albums.get(0);
+		
+		when(entityServiceMock.getEntityById(Album.class, album.getAlbumId()))
+			.thenThrow(new EntityServiceException(new Exception("test exception")));
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(song))
+				)
+				.andExpect(status().isInternalServerError());
+		
+		verify(entityServiceMock, times(1)).getEntityById(Album.class, album.getAlbumId());
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddSong_ServiceAccessAddSongThrowsException() throws Exception{
+		String tableName = "songs/";
+
+		Album album = (Album) albums.get(0);
+		
+		when(entityServiceMock.getEntityById(Album.class, album.getAlbumId()))
+			.thenReturn(album);
+		when(entityServiceMock.addSong(album, song.getSongName()))
+			.thenThrow(new EntityServiceException(new Exception("test exception")));
+		
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(song))
+				)
+				.andExpect(status().isInternalServerError());
+		
+		verify(entityServiceMock, times(1)).getEntityById(Album.class, album.getAlbumId());
+		verify(entityServiceMock, times(1)).addSong(album, "leuk liedje");
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testAddSong_SuccesfullyAdded() throws Exception{
+		String tableName = "songs/";
+
+		Album album = (Album) albums.get(0);
+		
+		when(entityServiceMock.getEntityById(Album.class, album.getAlbumId()))
+			.thenReturn(album);
+		when(entityServiceMock.addSong(album, song.getSongName()))
+			.thenReturn(song);
+		
+		mockMvc.perform(post(API_LOC + tableName)
+				.contentType(contentType)
+				.content(convertObjectToJson(song))
+				)
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.songName", is("leuk liedje")))
+				.andExpect(jsonPath("$.songId", is(1)))
+				.andExpect(jsonPath("$.album.albumName", is("a1")))
+				.andExpect(jsonPath("$.album.albumId", is(1)))
+				.andExpect(jsonPath("$.album.artist.artistName", is("one1")))
+				.andExpect(jsonPath("$.album.artist.artistId", is(1)));
+		
+		verify(entityServiceMock, times(1)).getEntityById(Album.class, album.getAlbumId());
+		verify(entityServiceMock, times(1)).addSong(album, "leuk liedje");
+		verifyNoMoreInteractions(entityServiceMock);
+	}
+
 }
