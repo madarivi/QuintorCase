@@ -24,8 +24,12 @@ import studycase.database.service.EntityService;
 @RestController
 public class EntityRestController {
     
-    @Autowired 
     EntityService entityService;
+    
+    @Autowired
+    public EntityRestController(EntityService entityService) {
+    	this.entityService = entityService;
+    }
     
     /**
      * Get all entities from a table

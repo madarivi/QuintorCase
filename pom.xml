@@ -35,8 +35,7 @@
 	<dependency>
 		<groupId>javax.servlet</groupId>
 		<artifactId>javax.servlet-api</artifactId>
-		<version>3.0.1</version>
-		<scope>provided</scope>
+		<version>3.1.0</version>
 	</dependency>
     
     <!-- database/hibernate -->
@@ -78,7 +77,7 @@
     <dependency>
     	<groupId>org.springframework</groupId>
     	<artifactId>spring-test</artifactId>
-    	<version>3.2.3.RELEASE</version>
+    	<version>4.0.0.RELEASE</version>
     	<scope>test</scope>
     </dependency>
     <dependency>

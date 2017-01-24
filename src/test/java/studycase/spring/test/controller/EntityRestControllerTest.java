@@ -48,17 +48,16 @@ public class EntityRestControllerTest {
 	
 	@Test
 	public void testGetEntities_ArtistsSuccesfullyRetrieved() throws Exception{
-//		Artist first = new Artist("J nummer 1");
-//		Artist second = new Artist("J nummer 2");
-//		Artist third = new Artist("J nummer 3");
-//		first.setArtistId(1);
-//		second.setArtistId(2);
-//		third.setArtistId(3);
-//		
-//		when(entityServiceMock.getEntities(Artist.class)).thenReturn(Arrays.asList(first, second, third));
-//		
-//		mockMvc.perform(get("/api/artists/"))
-//			.andExpect(status().isOk());
+		Artist first = new Artist("J nummer 1");
+		Artist second = new Artist("J nummer 2");
+		Artist third = new Artist("J nummer 3");
+		first.setArtistId(1);
+		second.setArtistId(2);
+		third.setArtistId(3);
+		
+		when(entityServiceMock.getEntities(Artist.class)).thenReturn(Arrays.asList(first, second, third));
+		
+		mockMvc.perform(get("/api/artists/")).andExpect(status().isOk());
 	}
 	
 	
