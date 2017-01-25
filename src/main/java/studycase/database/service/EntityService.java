@@ -32,6 +32,16 @@ public interface EntityService {
      */
 	public abstract List<Entity> getEntities(Class<? extends Entity> entityClass) throws EntityServiceException;
 	
+	/**
+     * Delete an entity from the database by id
+     * 
+     * @param entityClass   class of the entity
+     * @param entityId      id (primary key) of the entity
+     * @return              true if the entity was successfully found and deleted, false otherwise
+     *
+     * @throws EntityServiceException, if something went wrong getting the entities
+     * 
+     */
 	public abstract boolean deleteEntityById(Class<? extends Entity> entityClass, int entityId) throws EntityServiceException;
 	
 	/**

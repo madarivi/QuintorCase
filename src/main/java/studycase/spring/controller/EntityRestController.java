@@ -91,7 +91,6 @@ public class EntityRestController {
             entity = entityService.getEntityById(entityEnum.getEntityClass(), id);
         }
         catch (EntityServiceException e) {
-            e.printStackTrace();
             return new ResponseEntity<Entity>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (entity == null) {
@@ -125,7 +124,7 @@ public class EntityRestController {
         try {
             artist = entityService.addArtist(artistIn.getArtistName());
         }
-        catch (Exception e) {
+        catch (EntityServiceException e) {
             return new ResponseEntity<Artist>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
             
@@ -159,7 +158,7 @@ public class EntityRestController {
             if (artist == null) return new ResponseEntity<Album>(HttpStatus.BAD_REQUEST);
             album = entityService.addAlbum(artist, albumIn.getAlbumName());
         }
-        catch (Exception e) {
+        catch (EntityServiceException e) {
             return new ResponseEntity<Album>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
             
@@ -193,7 +192,7 @@ public class EntityRestController {
             if (album == null) return new ResponseEntity<Song>(HttpStatus.BAD_REQUEST);
             song = entityService.addSong(album, songIn.getSongName());
         }
-        catch (Exception e) {
+        catch (EntityServiceException e) {
             return new ResponseEntity<Song>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
             
@@ -211,7 +210,7 @@ public class EntityRestController {
      *                      something went wrong with the database access
      *                  ResponseEntity with status NO_CONTENT -> 
      *                      the entity was not found
-     *                  ResponseEntity with status OK and the Entity object ->
+     *                  ResponseEntity with status OK ->
      *                      the entity was successfully deleted
      */
     @DeleteMapping("/api/{table}/{id}")
@@ -227,7 +226,6 @@ public class EntityRestController {
                 deleted = entityService.deleteEntityById(entityEnum.getEntityClass(), id);
             }
             catch (Exception e) {
-                e.printStackTrace();
                 return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
             if (!deleted) {

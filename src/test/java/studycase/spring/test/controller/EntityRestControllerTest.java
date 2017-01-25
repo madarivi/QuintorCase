@@ -43,10 +43,8 @@ import studycase.spring.test.config.TestContext;
 public class EntityRestControllerTest {
 	
 	private MockMvc mockMvc;
-	
 	@Autowired
     private EntityService entityServiceMock;
-
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -55,8 +53,7 @@ public class EntityRestControllerTest {
             MediaType.APPLICATION_JSON.getSubtype(),                        
             Charset.forName("utf8")                     
             );
-    
-    
+        
     // Test Objects //
     private static List<Entity> artists = new ArrayList<Entity>();
     private static List<Entity> albums = new ArrayList<Entity>();
@@ -82,17 +79,16 @@ public class EntityRestControllerTest {
     	song.setSongId(1);
     }
     
-    // reset the mock before each test //
+    // reset the service mock before each test //
     @Before
     public void setUp() {
         Mockito.reset(entityServiceMock);
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
-	
-    
+	    
     // test getEntities //
     @Test
-    public void testGetEntities_IncorrectTableName() throws Exception {
+    public void testGetEntities_UnkownTableName() throws Exception {
     	String tableName = "none/";
     	
     	mockMvc.perform(get(API_LOC + tableName))
@@ -170,11 +166,10 @@ public class EntityRestControllerTest {
 		verify(entityServiceMock, times(1)).getEntities(Album.class);
 		verifyNoMoreInteractions(entityServiceMock);
 	}
-	
-	
+		
 	// test getEntity //
 	@Test
-	public void testGetEntity_IncorrectTableName() throws Exception {
+	public void testGetEntity_UnkownTableName() throws Exception {
     	String tableName = "none/";
     	int id = 1;
     	
@@ -253,7 +248,6 @@ public class EntityRestControllerTest {
 		verify(entityServiceMock, times(1)).getEntityById(Song.class, id);	
     	verifyNoMoreInteractions(entityServiceMock);
 	}
-
 
 	// test addArtist
 	@Test
@@ -379,7 +373,6 @@ public class EntityRestControllerTest {
 		verifyNoMoreInteractions(entityServiceMock);
 	}
 	
-	
 	@Test
 	public void testAddAlbum_ServiceAccessFindArtistThrowsException() throws Exception{
 		String tableName = "albums/";
@@ -424,7 +417,6 @@ public class EntityRestControllerTest {
 		verifyNoMoreInteractions(entityServiceMock);
 	}
 	
-	
 	@Test
 	public void testAddAlbum_SuccesfullyAdded() throws Exception{
 		String tableName = "albums/";
@@ -452,14 +444,6 @@ public class EntityRestControllerTest {
 		verifyNoMoreInteractions(entityServiceMock);
 	}
 	
-	// helper method for converting object to JSON //
-	
-	public static byte[] convertObjectToJson(Object object) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        return mapper.writeValueAsBytes(object);
-    }
-
 	// test addSong
 	@Test
 	public void testAddSong_InvalidObjectNotAnSong() throws Exception{
@@ -582,4 +566,83 @@ public class EntityRestControllerTest {
 		verifyNoMoreInteractions(entityServiceMock);
 	}
 
+	// test deleteEntity
+	@Test
+	public void testDeleteEntity_UnkownTableName() throws Exception {
+    	String tableName = "invalid/";
+    	int id = 1;
+    	
+    	mockMvc.perform(delete(API_LOC + tableName + id))
+    		.andExpect(status().isBadRequest());
+    		
+    	verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+    public void testDeleteEntity_ServiceAccessThrowsException() throws Exception {
+    	String tableName = "artists/";
+    	int id = 1;
+    	
+    	when(entityServiceMock.deleteEntityById(Artist.class, id))
+    		.thenThrow(new EntityServiceException(new Exception("test exception")));
+    	
+    	mockMvc.perform(delete(API_LOC + tableName + id))
+    		.andExpect(status().isInternalServerError());
+    	
+    	verify(entityServiceMock, times(1)).deleteEntityById(Artist.class, id);	
+    	verifyNoMoreInteractions(entityServiceMock);
+    }
+	
+	@Test
+	public void testDeleteEntity_ArtistsNotFound() throws Exception{
+		String tableName = "artists/";
+		int id = 1;
+		
+		when(entityServiceMock.deleteEntityById(Artist.class, id))
+			.thenReturn(false);
+		
+		mockMvc.perform(delete(API_LOC + tableName + id))
+			.andExpect(status().isNoContent());
+
+    	verify(entityServiceMock, times(1)).deleteEntityById(Artist.class, id);	
+    	verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testDeleteEntity_ArtistSuccesfullyDeleted() throws Exception {
+		String tableName = "artists/";
+		int id = 1;
+
+		when(entityServiceMock.deleteEntityById(Artist.class, id))
+			.thenReturn(true);
+		
+		mockMvc.perform(delete(API_LOC + tableName + id))
+			.andExpect(status().isOk());
+		
+		verify(entityServiceMock, times(1)).deleteEntityById(Artist.class, id);	
+    	verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	@Test
+	public void testDeleteEntity_SongSuccesfullyDeleted() throws Exception {
+		String tableName = "songs/";
+		int id = 1;
+
+		when(entityServiceMock.deleteEntityById(Song.class, id))
+			.thenReturn(true);
+		
+		mockMvc.perform(delete(API_LOC + tableName + id))
+			.andExpect(status().isOk());
+		
+		verify(entityServiceMock, times(1)).deleteEntityById(Song.class, id);	
+    	verifyNoMoreInteractions(entityServiceMock);
+	}
+	
+	// helper method for converting object to JSON //
+	
+	public static byte[] convertObjectToJson(Object object) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return mapper.writeValueAsBytes(object);
+    }
 }

@@ -2,6 +2,7 @@ package studycase.database.service;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -38,7 +39,7 @@ public class EntityServiceImpl implements EntityService{
 	        session.getTransaction().commit();
 	        session.close();
         }
-        catch (Exception e) {
+        catch (HibernateException e) {
         	System.err.println(e);
         	if (session != null) session.getTransaction().rollback();
         	throw new EntityServiceException(e);
@@ -63,7 +64,7 @@ public class EntityServiceImpl implements EntityService{
 	        entities = query.list();
 	        session.getTransaction().commit();
         }
-        catch(Exception e) {
+        catch(HibernateException e) {
         	System.err.println(e);
         	if (session != null) session.getTransaction().rollback();
         	throw new EntityServiceException(e);
@@ -85,7 +86,7 @@ public class EntityServiceImpl implements EntityService{
 	        session.save(entity);
 	        session.getTransaction().commit();
         }
-        catch(Exception e) {
+        catch(HibernateException e) {
         	System.err.println(e);
         	if (session != null) session.getTransaction().rollback();
         	throw new EntityServiceException(e);
@@ -120,25 +121,31 @@ public class EntityServiceImpl implements EntityService{
     }
 
     // Delete from the database //
-    
-    /**
-     * Delete an entity from the database by id
-     * 
-     * @param entityClass   class of the entity
-     * @param entityId      id (primary key) of the entity
-     * @return              true if the entity was successfully found and deleted, false otherwise
-     */
-    public boolean deleteEntityById(Class<? extends Entity> entityClass, int id) {
-        Session session = sessionFactory.openSession();
+    public boolean deleteEntityById(Class<? extends Entity> entityClass, int id) throws EntityServiceException {
+        boolean deleted = false;
+    	
+    	Session session = null;
+    	
+    	try {
+    		session = sessionFactory.openSession();
+	        session.beginTransaction();
+	        Entity entity = (Entity) session.get(entityClass, id);
+	        if (entity != null) {
+	        	session.delete(entity);
+	        	deleted = true;
+	        }
+	        session.getTransaction().commit();
+    	}
+        catch(HibernateException e) {
+        	System.err.println(e);
+        	if (session != null) session.getTransaction().rollback();
+        	throw new EntityServiceException(e);
+        }
+        finally {
+        	if (session != null) session.close();
+        }
         
-        session.beginTransaction();
-        Entity entity = (Entity) session.get(entityClass, id);
-        if (entity == null) return false;
-        session.delete(entity);
-        session.getTransaction().commit();
-        session.close();
-        
-        return true;
+	    return deleted;
     }
     
 }
