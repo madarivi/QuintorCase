@@ -37,7 +37,6 @@ public class EntityServiceImpl implements EntityService{
 	        session.beginTransaction();
 	        entity = (Entity) session.get(entityClass, entityId);
 	        session.getTransaction().commit();
-	        session.close();
         }
         catch (HibernateException e) {
         	System.err.println(e);
