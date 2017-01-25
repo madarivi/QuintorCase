@@ -5,11 +5,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import studycase.database.entities.Album;
@@ -24,11 +20,10 @@ import studycase.database.entities.Song;
  *
  */
 @Service
-public class EntityServiceImpl implements EntityService, InitializingBean, DisposableBean{
+public class EntityServiceImpl implements EntityService{
     
-    private ServiceRegistry serviceRegistry;
+    @Autowired
     private SessionFactory sessionFactory;
-    
     
     // get from the database //
     @Override
@@ -79,8 +74,7 @@ public class EntityServiceImpl implements EntityService, InitializingBean, Dispo
         
         return entities;
     }
-        
-
+    
     // Add to the database //
     private void addEntity(Entity entity) throws EntityServiceException {
         
@@ -125,7 +119,6 @@ public class EntityServiceImpl implements EntityService, InitializingBean, Dispo
         return song;
     }
 
-    
     // Delete from the database //
     
     /**
@@ -148,19 +141,4 @@ public class EntityServiceImpl implements EntityService, InitializingBean, Dispo
         return true;
     }
     
-    
-    // Bean utilities //
-    
-    public void afterPropertiesSet() throws Exception {
-        Configuration conf = new Configuration();
-        conf.configure();
-        serviceRegistry = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
-        sessionFactory = conf.buildSessionFactory(serviceRegistry);
-    }
-
-    public void destroy() throws Exception {
-        sessionFactory.close();
-        StandardServiceRegistryBuilder.destroy(serviceRegistry);
-    }
-
 }
