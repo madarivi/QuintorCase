@@ -12,8 +12,6 @@ import studycase.spring.config.AppContext;
 
 public class AppConfig implements WebApplicationInitializer {
 
-    private static final String CONFIG_LOCATION = "studycase.spring.config";
-
     public void onStartup(ServletContext servletContext) throws ServletException {
 
         // Create ApplicationContext
@@ -29,6 +27,4 @@ public class AppConfig implements WebApplicationInitializer {
         servlet.setLoadOnStartup(1);
         
     }
-
-   
 }

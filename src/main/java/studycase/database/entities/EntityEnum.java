@@ -7,7 +7,7 @@ public enum EntityEnum {
 
     private Class<? extends Entity> cls;
 
-    EntityEnum(Class<? extends Entity> cls) {
+    private EntityEnum(Class<? extends Entity> cls) {
       this.cls = cls;
     }
 

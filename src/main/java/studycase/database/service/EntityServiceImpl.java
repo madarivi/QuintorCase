@@ -17,7 +17,7 @@ import studycase.database.entities.Song;
 /**
  * @author Marius
  * 
- * Controller for Hibernate entities
+ * Service accessing the database via Hibernate
  *
  */
 @Service
